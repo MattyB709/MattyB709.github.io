@@ -14,19 +14,19 @@ timezone: America/Chicago
 # jekyll-seo-tag settings › https://github.com/jekyll/jekyll-seo-tag/blob/master/docs/usage.md
 # ↓ --------------------------
 
-title: Personal Blog Project # the main title
+title: Personal blog # the main title
 
-tagline: This is my blog that I will be updating weekly with what I did that week and my current goals # it will display as the sub-title
+tagline: A text-focused Jekyll theme # it will display as the sub-title
 
 description: >- # used by seo meta and the atom feed
-  bello sucks lmao
+  A minimal, responsive and feature-rich Jekyll theme for technical writing.
 
 # Fill in the protocol & hostname for your site.
 # e.g. 'https://username.github.io', note that it does not end with a '/'.
-
+url: ""
 
 github:
-  username: MattyB709 # change to your github username
+  username: github_username # change to your github username
 
 twitter:
   username: twitter_username # change to your twitter username
@@ -35,7 +35,7 @@ social:
   # Change to your full name.
   # It will be displayed as the default author of the posts and the copyright owner in the Footer
   name: Matthew Builes
-  email: Matthew.Builes8@gmail.com # change to your email address
+  email: example@domain.com # change to your email address
   links:
     # The first element serves as the copyright owner's link
     - https://twitter.com/username # change to your twitter homepage
