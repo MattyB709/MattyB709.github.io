@@ -1,8 +1,8 @@
 ---
 title:      Pride and Prejudice review
-date:       2024-05-24 11:51:45
+date:       2024-05-24 11:51:45 +0800
 categories: [blog]
-tags: [Literature]
+tags: [literature]
 ---
 
 # Pride and Prejudice
