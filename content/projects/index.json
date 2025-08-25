@@ -5,6 +5,12 @@
       "title": "Vibe Seed",
       "subtitle": "The minimal blog scaffold you’re reading.",
       "date": "2025-01-02"
+    },
+    {
+      "slug": "numpy",
+      "title": "Numpy is All You Need",
+      "subtitle": "I implemented a neural network from scratch in Numpy.",
+      "date": "2025-04-03"
     }
   ]
 }
