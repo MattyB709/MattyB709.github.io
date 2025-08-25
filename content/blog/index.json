@@ -1,10 +1,10 @@
 {
   "posts": [
     {
-      "slug": "hello-world",
-      "title": "Hello, World",
-      "subtitle": "A tiny first post to say hi.",
-      "date": "2025-01-01"
+      "slug": "2024",
+      "title": "2024 Wrapped",
+      "subtitle": "A summary of my year, plus what I want in the future.",
+      "date": "2024-12-24"
     }
   ]
 }
