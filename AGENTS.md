@@ -13,7 +13,7 @@
   - Blog posts: `content/blog/*.md` with frontmatter
   - Projects posts: `content/projects/*.md` with frontmatter
   - Pages: `content/pages/*.md` with frontmatter
-  - Manifests: `content/blog/_index.json`, `content/projects/_index.json`
+- Manifests: `content/blog/index.json`, `content/projects/index.json`
 - Assets:
   - CSS: `assets/css/base.css`, `assets/css/theme.css`
   - JS: `assets/js/site.js`, `assets/js/render.js`
@@ -36,11 +36,11 @@ Markdown content here...
 
 ## How to add a blog post
 1. Create `content/blog/my-post.md` with frontmatter + content.
-2. Update `content/blog/_index.json` to include the new entry `{ slug, title, subtitle, date }`.
+2. Update `content/blog/index.json` to include the new entry `{ slug, title, subtitle, date }`.
 3. The list appears at `/blog.html`; view full post at `/post.html?type=blog&slug=my-post`.
 
 ## How to add a project post
-- Same as blog, but under `content/projects` and `_index.json` there.
+- Same as blog, but under `content/projects` and `index.json` there.
 
 ## How to add a page (e.g., About)
 1. Create `content/pages/about.md` with frontmatter (slug: about).

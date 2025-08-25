@@ -124,7 +124,7 @@ async function loadPage(slug) {
 }
 
 async function loadList(type) {
-  const listPath = `content/${type}/_index.json`;
+  const listPath = `content/${type}/index.json`;
   const { posts } = await fetchJSON(listPath);
   const main = document.querySelector('main');
   const ul = document.createElement('div');
