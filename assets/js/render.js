@@ -75,7 +75,7 @@ async function loadPost(type, slug) {
   const mdPath = `content/${type}/${slug}.md`;
   const raw = await fetchText(mdPath);
   const { meta, body } = parseFrontmatter(raw);
-  document.title = meta.title ? `${meta.title} · Vibe` : 'Post · Vibe';
+  document.title = meta.title ? `Matthew - ${meta.title}` : 'Matthew - Post';
 
   const main = document.querySelector('main');
   const header = document.createElement('header');
@@ -102,7 +102,7 @@ async function loadPage(slug) {
   const mdPath = `content/pages/${slug}.md`;
   const raw = await fetchText(mdPath);
   const { meta, body } = parseFrontmatter(raw);
-  document.title = meta.title ? `${meta.title} · Vibe` : 'Page · Vibe';
+  document.title = meta.title ? `Matthew - ${meta.title}` : 'Matthew - Page';
 
   const main = document.querySelector('main');
   const header = document.createElement('header');
