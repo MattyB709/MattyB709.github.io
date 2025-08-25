@@ -1,0 +1,11 @@
+{
+  "posts": [
+    {
+      "slug": "hello-world",
+      "title": "Hello, World",
+      "subtitle": "A tiny first post to say hi.",
+      "date": "2025-01-01"
+    }
+  ]
+}
+

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vibe · Home</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/base.css" />
+    <link rel="stylesheet" href="assets/css/theme.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous" />
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+    <script defer src="assets/js/site.js"></script>
+    <script defer src="assets/js/render.js"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <nav class="nav">
+          <a href="index.html">Home</a>
+          <a href="blog.html">Blog</a>
+          <a href="projects.html">Projects</a>
+        </nav>
+      </div>
+    </header>
+    <main class="container">
+      <h1>Welcome</h1>
+      <p>My name is Matthew Builes, I'm an undergraduate CS+Math student at UT Austin
+         interested in machine learning. I'm a second generation immigrant from Colombia
+         who grew up in Houston, and I'm the youngest of four siblings. 
+         In my free time, I love to read, go to the gym, and build things.</p>
+    </main>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        if (typeof renderMathIn === 'function') {
+          renderMathIn(document.querySelector('main'));
+        } else if (window.renderMathInElement) {
+          // Fallback: call KaTeX auto-render directly with $ and $$
+          renderMathInElement(document.querySelector('main'), {
+            delimiters: [
+              { left: '$$', right: '$$', display: true },
+              { left: '$', right: '$', display: false }
+            ],
+            throwOnError: false,
+            ignoredTags: ['script','noscript','style','textarea','pre','code']
+          });
+        }
+      });
+    </script>
+    <footer class="site-footer">
+      <div class="container">
+        <div>© 2025 · Matthew Builes · <a href="mailto:matthew.builes8@gmail.com">matthew.builes8@gmail.com</a></div>
+      </div>
+    </footer>
+  </body>
+</html>

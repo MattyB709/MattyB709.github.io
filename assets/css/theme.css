@@ -1,0 +1,81 @@
+/* Theme overrides to match the requested style */
+:root {
+  --width: 720px;
+  --bg: #222129;
+  --fg: #FFA86A;
+  --link: #FFA86A;
+  --link-visited: #bc8d6b;
+  --border: #FFA86A;
+  --code-bg: #bc8d6b;
+  --code-fg: #222129;
+}
+
+body {
+  font-family: 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  background-color: var(--bg);
+  color: var(--fg);
+}
+
+/* Layout width + main panel border similar to provided CSS */
+.container { max-width: var(--width); }
+main.container {
+  margin-top: 40px;
+  margin-bottom: 20px;
+  padding: 30px;
+  border: 1px solid var(--link);
+}
+
+/* Headings + emphasis color */
+h1, h2, h3, h4, h5, h6 { color: var(--fg); }
+strong, b { color: var(--fg); }
+
+/* Links */
+main a { color: var(--link); text-decoration: underline; }
+main a:hover { text-decoration: underline; }
+main a:visited { color: var(--link-visited); }
+
+/* Header and footer tweaks to match theme */
+header.site-header { border-bottom-color: var(--link); background: var(--bg); }
+header.site-header .nav a { color: var(--fg); }
+footer.site-footer { border-top-color: var(--link); color: var(--fg); }
+footer.site-footer a { color: var(--link); }
+
+/* Code styling */
+code {
+  background-color: var(--code-bg);
+  color: var(--code-fg);
+  border-radius: 3px;
+}
+pre { background-color: var(--code-bg); }
+pre, pre code { color: var(--code-fg); }
+
+/* Blockquote styling similar to provided */
+blockquote {
+  border-top: 1px solid var(--fg);
+  border-bottom: 1px solid var(--fg);
+  color: var(--fg);
+  padding: 20px;
+  font-style: italic;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* List items styling keeps minimalist spacing */
+.post-list { gap: 20px; }
+.post-item .meta { color: var(--fg); opacity: 0.9; }
+.subtitle { color: var(--fg); opacity: 0.9; }
+
+/* Tables */
+table { width: 100%; border-collapse: collapse; }
+table, th, td { border: 1px dashed var(--fg); padding: 10px; }
+
+/* HR */
+hr { border: 0; border-top: 1px dashed var(--fg); }
+
+/* Images */
+img { max-width: 100%; }
+
+/* Small-screen adjustments */
+@media only screen and (max-width: 767px) {
+  main.container { padding: 20px; margin-top: 30px; margin-bottom: 10px; }
+}

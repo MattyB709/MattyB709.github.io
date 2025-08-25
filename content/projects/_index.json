@@ -1,0 +1,11 @@
+{
+  "posts": [
+    {
+      "slug": "vibe-seed",
+      "title": "Vibe Seed",
+      "subtitle": "The minimal blog scaffold you’re reading.",
+      "date": "2025-01-02"
+    }
+  ]
+}
+

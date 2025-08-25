@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vibe · Page</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/base.css" />
+    <link rel="stylesheet" href="assets/css/theme.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous" />
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js" crossorigin="anonymous"></script>
+    <script defer src="assets/js/site.js"></script>
+    <script defer src="assets/js/render.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const params = new URLSearchParams(location.search);
+        const slug = params.get('slug');
+        if (!slug) {
+          document.querySelector('main').innerHTML = '<p>Missing slug.</p>';
+          return;
+        }
+        Vibe.loadPage(slug).catch(err => {
+          console.error(err);
+          document.querySelector('main').innerHTML = '<p>Page not found.</p>';
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <nav class="nav">
+          <a href="index.html">Home</a>
+          <a href="blog.html">Blog</a>
+          <a href="projects.html">Projects</a>
+        </nav>
+      </div>
+    </header>
+    <main class="container">
+      <p>Loading…</p>
+    </main>
+    <footer class="site-footer">
+      <div class="container">
+        <div>© 2025 · Matthew Builes · <a href="mailto:matthew.builes8@gmail.com">matthew.builes8@gmail.com</a></div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,99 @@
+:root {
+  --bg: #ffffff;
+  --fg: #111111;
+  --muted: #666666;
+  --link: #0b57d0;
+  --link-visited: #6a0dad;
+  --border: #e5e5e5;
+  --code-bg: #f6f8fa;
+  --radius: 8px;
+  --font-sans: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --max-width: 42rem;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+}
+
+html { box-sizing: border-box; }
+*, *::before, *::after { box-sizing: inherit; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-serif);
+  line-height: 1.6;
+}
+
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4);
+}
+
+header.site-header {
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  z-index: 10;
+}
+
+.site-header .container { display: flex; gap: var(--space-4); align-items: baseline; }
+.brand { font-weight: 700; font-family: var(--font-sans); }
+.nav { margin-left: auto; display: flex; gap: var(--space-4); }
+.nav a { text-decoration: none; color: var(--fg); }
+.nav a.active { text-decoration: underline; text-underline-offset: 4px; }
+
+main a { color: var(--link); }
+main a:visited { color: var(--link-visited); }
+
+h1, h2, h3 { line-height: 1.2; }
+h1 { font-size: 2rem; margin: var(--space-4) 0 var(--space-3); }
+h2 { font-size: 1.5rem; margin: var(--space-5) 0 var(--space-3); }
+h3 { font-size: 1.25rem; margin: var(--space-4) 0 var(--space-2); }
+p { margin: 0 0 var(--space-4); }
+
+ul, ol { padding-left: 1.2rem; }
+blockquote {
+  margin: var(--space-4) 0;
+  padding-left: var(--space-4);
+  border-left: 3px solid var(--border);
+  color: var(--muted);
+}
+
+code, pre { font-family: var(--font-mono); }
+code {
+  background: var(--code-bg);
+  padding: 0 0.25em;
+  border-radius: 4px;
+}
+pre {
+  background: var(--code-bg);
+  padding: var(--space-4);
+  border-radius: var(--radius);
+  overflow: auto;
+}
+pre code { background: transparent; padding: 0; }
+
+.post-list { display: grid; gap: var(--space-5); }
+.post-item { display: grid; gap: 0.25rem; }
+.post-item .meta { color: var(--muted); font-size: 0.9rem; }
+.subtitle { color: var(--muted); }
+
+.post header { margin-bottom: var(--space-5); }
+.post .post-meta { color: var(--muted); }
+
+footer.site-footer { border-top: 1px solid var(--border); margin-top: var(--space-6); }
+footer.site-footer .container { display: flex; justify-content: space-between; color: var(--muted); font-size: 0.9rem; }
+
+.hidden { display: none; }
+
+/* KaTeX tweaks to match the minimalist theme */
+.katex-display { margin: var(--space-5) 0; }
+
