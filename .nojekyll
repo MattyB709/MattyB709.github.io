@@ -1,0 +1,3 @@
+# Disable Jekyll on GitHub Pages so Markdown files are served as static assets.
+# This prevents Jekyll from transforming files in `content/**` and breaking client-side fetching.
+
