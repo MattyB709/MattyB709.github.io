@@ -5,6 +5,12 @@
       "title": "Numpy is All You Need",
       "subtitle": "I implemented a neural network from scratch in Numpy.",
       "date": "2025-04-03"
+    },
+    {
+      "slug": "ppe",
+      "subtitle": "I built big brother",
+      "title": "Creating Automatic PPE Detection",
+      "date": "2025-08-30"
     }
   ]
 }

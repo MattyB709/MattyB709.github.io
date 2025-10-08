@@ -14,6 +14,15 @@ async function fetchJSON(path) {
   return await res.json();
 }
 
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function parseFrontmatter(text) {
   // Simple frontmatter parser: starts with --- and ends with ---
   if (!text.startsWith('---')) return { meta: {}, body: text };
@@ -40,13 +49,36 @@ function parseFrontmatter(text) {
 function markdownToHtml(md) {
   // Configure marked for minimalist output
   if (window.marked) {
-    marked.setOptions({
+    const renderer = new marked.Renderer();
+    renderer.image = (href, title, text) => {
+      let src = href;
+      let alt = text;
+      let caption = title;
+      if (href && typeof href === 'object') {
+        const token = href;
+        src = token.href;
+        caption = token.title;
+        alt = token.text || token.raw || '';
+      }
+      const safeSrc = escapeHtml(src);
+      const safeAlt = escapeHtml(alt);
+      const safeCaption = caption ? escapeHtml(caption) : '';
+      const titleAttr = safeCaption ? ` title="${safeCaption}"` : '';
+      const captionHtml = safeCaption ? `<figcaption>${safeCaption}</figcaption>` : '';
+      return `<figure class="post-figure"><img src="${safeSrc}" alt="${safeAlt}"${titleAttr} loading="lazy">${captionHtml}</figure>`;
+    };
+    const options = {
       gfm: true,
       breaks: false,
       headerIds: true,
-      mangle: false
-    });
-    return marked.parse(md);
+      mangle: false,
+      renderer
+    };
+    marked.setOptions(options);
+    if (typeof marked.use === 'function') {
+      marked.use({ renderer });
+    }
+    return typeof marked.parse === 'function' ? marked.parse(md) : marked(md);
   }
   // Fallback: escape
   const div = document.createElement('div');
@@ -55,7 +87,12 @@ function markdownToHtml(md) {
 }
 
 function sanitize(html) {
-  return window.DOMPurify ? DOMPurify.sanitize(html, { USE_PROFILES: { html: true } }) : html;
+  if (!window.DOMPurify) return html;
+  return DOMPurify.sanitize(html, {
+    USE_PROFILES: { html: true },
+    ADD_TAGS: ['figure', 'figcaption'],
+    ADD_ATTR: ['class', 'loading']
+  });
 }
 
 function renderMathIn(el) {
