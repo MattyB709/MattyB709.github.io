@@ -1,12 +1,12 @@
 ---
 slug: ppe
-subtitle: I built big brother
-title: Creating Automatic PPE Detection
+subtitle: Building Big Brother
+title: Automatic PPE Detection
 date: 2025-08-30
 ---
 # Abstract
 
-This summer I worked at the Eurofins Center of Excellence where I built an end-to-end object detection system for automatic personal protective equipment (PPE) detection. The purpose was to automatically identify whether or not people in laboratories were wearing their lab coat, gloves, and eye wear without the need for manual supervision. I started out by creating my own custom dataset from our laboratory's security camera feed, manually drawing boxes around people and labeling them for their PPE. I ended with a dataset of over 1100 images labeled by hand, with another ~$700$ labeled semi-automatically using the model's predictions. From here I finetuned [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX) on the new dataset and classes, getting an mAP of 0.56 on a held out test set. The model was quantized down to INT8 precision using post training quantization and optimized with TensorRT for deployment on a Jetson Orin Nano. With INT8 precision, the model achieved a speedup of over 3x (see the image below) with only a slight decrease in mAP. 
+This summer I worked at the Eurofins Center of Excellence where I built an end-to-end object detection system for automatic personal protective equipment (PPE) detection. The purpose was to automatically identify whether or not people in laboratories were wearing their lab coat, gloves, and eyewear without the need for manual supervision. I started out by creating my own custom dataset from our laboratory's security camera feed, manually drawing boxes around people and labeling them for their PPE, ending with a dataset of over 1100 images. From here I finetuned [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX) on the new dataset and classes, getting an mAP of 0.56 on a held out test set. The model was quantized down to INT8 precision using post training quantization and optimized with TensorRT for deployment on a Jetson Orin Nano. With INT8 precision, the model achieved a speedup of over 3x (see the image below) with only a slight decrease in mAP. 
 
 # The Project
 ![yolo output](assets/images/yolo_output.png "Example Model Output")

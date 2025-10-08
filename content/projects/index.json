@@ -8,8 +8,8 @@
     },
     {
       "slug": "ppe",
-      "subtitle": "I built big brother",
-      "title": "Creating Automatic PPE Detection",
+      "subtitle": "I built an end to end object detection system to detect personal protective equipment (PPE).",
+      "title": "Automatic PPE Detection",
       "date": "2025-08-30"
     }
   ]
