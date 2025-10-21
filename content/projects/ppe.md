@@ -28,12 +28,11 @@ Above, $H\times W$ is the number of "pixels," which should be interpreted as gri
 
 For training I had to start out by reparameterizing the model to output 6 classes instead of 80, which is what the original YOLOX had. This simply involved going into the model's state dictionary and replacing the output tensors with new ones that outputted the correct number of classes, initializing them like normal. I implemented a custom PyTorch dataset to read in the images and labels from the YOLO format and apply data augmentations. Most of the data augmentations could be done using Torchvision, such as random flip and jitter, but I had to write my own mosaic code. What mosaic does is it stitches together four images randomly, as shown below. 
 
-![Mosaic image] (assets/images/mosaic.png "An example of the Mosaic augmentation, done by stitching 4 images together and cropping down to regular size.")
+![Mosaic image](assets/images/mosaic.png "An example of the Mosaic augmentation, done by stitching 4 images together and cropping down to regular size.")
 
 The difficult part about this was correctly shifting all the bounding boxes to their new positions, but once I got it working the results were clear. The two biggest difference makers in model performance (besides pretraining) were dataset size and the data augmentations:
 
-![map vs data](assets/images/mapvsdata.png "Increasing dataset size and applying augmentations led to large increases in mAP. Each point corresponds to the maximum mAP achieved during a 200 epoch training run for a given dataset size. 
-")
+![map vs data](assets/images/mapvsdata.png "Increasing dataset size and applying augmentations led to large increases in mAP. Each point corresponds to the maximum mAP achieved during a 200 epoch training run for a given dataset size. ")
 
 The primary metric for YOLO is mean Average Precision (mAP), which is the area under the Average Precision curve, meant to both measure the model's recall and precision. Interestingly, the data augmentations weren't always helpful, but for the maximum dataset size it made a sizable difference in mAP. 
 
