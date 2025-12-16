@@ -5,6 +5,17 @@
       "title": "Numpy is All You Need",
       "subtitle": "I implemented a neural network from scratch in Numpy.",
       "date": "2025-04-03"
+    },
+    {
+      "slug": "ppe",
+      "title": "Building an Automatic PPE Detection System",
+      "subtitle": "I built an end to end object detection system for PPE Detection using YOLOX",
+      "date": "2025-08-26"
+    },
+    {
+      "slug": "point",
+      "title": "Making a Point Gesture Recognition Model",
+      "subtitle": ""
     }
   ]
 }
