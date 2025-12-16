@@ -97,3 +97,19 @@ footer.site-footer .container { display: flex; justify-content: space-between; c
 /* KaTeX tweaks to match the minimalist theme */
 .katex-display { margin: var(--space-5) 0; }
 
+figure.post-figure {
+  margin: var(--space-6) 0;
+  text-align: center;
+}
+
+figure.post-figure img {
+  max-width: 100%;
+  border-radius: var(--radius);
+}
+
+figure.post-figure figcaption {
+  margin-top: var(--space-2);
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-style: italic;
+}

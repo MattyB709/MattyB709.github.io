@@ -8,14 +8,9 @@
     },
     {
       "slug": "ppe",
-      "title": "Building an Automatic PPE Detection System",
-      "subtitle": "I built an end to end object detection system for PPE Detection using YOLOX",
-      "date": "2025-08-26"
-    },
-    {
-      "slug": "point",
-      "title": "Making a Point Gesture Recognition Model",
-      "subtitle": ""
+      "subtitle": "I built an end to end object detection system to detect personal protective equipment (PPE).",
+      "title": "Automatic PPE Detection",
+      "date": "2025-08-30"
     }
   ]
 }

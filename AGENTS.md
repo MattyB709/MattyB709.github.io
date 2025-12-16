@@ -57,3 +57,14 @@ Markdown content here...
 - Implemented Markdown + LaTeX rendering pipeline with custom delimiters.
 - Added sample content (blog, project, and about page) and example manifests.
 - Wrote usage instructions and frontmatter spec in this file.
+- Added figure-aware image rendering with caption support, sanitizer allowances, and theme styles.
+
+## Image Support
+- Place image files anywhere in the repo (e.g. `assets/images/` or alongside related content) and reference them with a relative path from the site root.
+- Use standard Markdown image syntax; the optional title field becomes the figure caption:
+  ```
+  ![Alt text describing the image](assets/images/my-photo.jpg "Figure 1: My latest build")
+  ```
+- Output renders as a centered figure with the image, a faint border radius, and a caption beneath it—matching the existing typography.
+- Captions and attributes are escaped and sanitized via DOMPurify (`figure`/`figcaption` retained with added allowances).
+- Images load lazily (`loading="lazy"`) to avoid regressing performance on existing pages.
