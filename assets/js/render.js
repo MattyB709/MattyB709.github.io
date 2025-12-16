@@ -46,9 +46,70 @@ function parseFrontmatter(text) {
   return { meta, body };
 }
 
+function toYouTubeEmbed(idOrUrl) {
+  try {
+    const u = new URL(idOrUrl, 'https://example.com');
+    const host = u.hostname.replace(/^www\./, '');
+    if (host.includes('youtu')) {
+      // youtu.be/<id>
+      if (host === 'youtu.be') return `https://www.youtube-nocookie.com/embed/${u.pathname.replace(/^\//,'')}`;
+      // youtube.com/watch?v=<id>
+      const v = u.searchParams.get('v');
+      if (v) return `https://www.youtube-nocookie.com/embed/${v}`;
+      // youtube.com/embed/<id>
+      const m = u.pathname.match(/\/embed\/([^/?#]+)/);
+      if (m) return `https://www.youtube-nocookie.com/embed/${m[1]}`;
+    }
+  } catch (_) {
+    /* not a URL, treat as ID */
+  }
+  // Fallback: treat as raw ID
+  return `https://www.youtube-nocookie.com/embed/${idOrUrl}`;
+}
+
+function toVimeoEmbed(idOrUrl) {
+  try {
+    const u = new URL(idOrUrl, 'https://example.com');
+    const host = u.hostname.replace(/^www\./, '');
+    if (host.endsWith('vimeo.com')) {
+      // player.vimeo.com/video/<id>
+      const m1 = u.pathname.match(/\/video\/([^/?#]+)/);
+      if (m1) return `https://player.vimeo.com/video/${m1[1]}`;
+      // vimeo.com/<id>
+      const m2 = u.pathname.match(/^\/([^/?#]+)/);
+      if (m2) return `https://player.vimeo.com/video/${m2[1]}`;
+    }
+  } catch (_) {
+    /* not a URL, treat as ID */
+  }
+  return `https://player.vimeo.com/video/${idOrUrl}`;
+}
+
+function buildEmbedFigure(src, caption) {
+  const safeCaption = caption ? escapeHtml(caption) : '';
+  const figcap = safeCaption ? `<figcaption>${safeCaption}</figcaption>` : '';
+  return `\n\n<figure class="post-figure"><iframe src="${escapeHtml(src)}" title="${safeCaption || 'Video'}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>${figcap}</figure>\n\n`;
+}
+
+function applyShortcodes(md) {
+  // {{ youtube: ID_OR_URL "Optional caption" }}
+  md = md.replace(/\{\{\s*youtube\s*:\s*(\S+)(?:\s+"([^"]*)")?\s*\}\}/gi, (_m, idOrUrl, cap) => {
+    const src = toYouTubeEmbed(idOrUrl);
+    return buildEmbedFigure(src, cap);
+  });
+  // {{ vimeo: ID_OR_URL "Optional caption" }}
+  md = md.replace(/\{\{\s*vimeo\s*:\s*(\S+)(?:\s+"([^"]*)")?\s*\}\}/gi, (_m, idOrUrl, cap) => {
+    const src = toVimeoEmbed(idOrUrl);
+    return buildEmbedFigure(src, cap);
+  });
+  return md;
+}
+
 function markdownToHtml(md) {
   // Configure marked for minimalist output
   if (window.marked) {
+    // Expand custom shortcodes before Markdown parsing
+    md = applyShortcodes(md);
     const renderer = new marked.Renderer();
     renderer.image = (href, title, text) => {
       let src = href;
@@ -86,12 +147,68 @@ function markdownToHtml(md) {
   return `<pre>${div.innerHTML}</pre>`;
 }
 
+// Configure DOMPurify once to safely allow trusted video iframes
+function configureSanitizerForEmbeds() {
+  if (!window.DOMPurify) return;
+  if (window.__VIBE_SANITIZER_CONFIGURED) return;
+  window.__VIBE_SANITIZER_CONFIGURED = true;
+
+  const allowedIframeHosts = new Set([
+    'www.youtube.com',
+    'youtube.com',
+    'www.youtube-nocookie.com',
+    'youtube-nocookie.com',
+    'player.vimeo.com'
+  ]);
+
+  // Remove disallowed iframes and enforce safe defaults on allowed ones
+  DOMPurify.addHook('uponSanitizeElement', (node, data) => {
+    if (data.tagName && data.tagName.toLowerCase() === 'iframe') {
+      const src = node.getAttribute('src') || '';
+      try {
+        const url = new URL(src, location.origin);
+        const host = url.hostname.toLowerCase();
+        const isYouTube = host.includes('youtube');
+        const isVimeo = host === 'player.vimeo.com';
+        const pathOk = isYouTube ? url.pathname.startsWith('/embed/') : true;
+        const allowed = allowedIframeHosts.has(host) && pathOk;
+        if (!allowed) {
+          node.parentNode && node.parentNode.removeChild(node);
+          return;
+        }
+        // Safe defaults
+        if (!node.hasAttribute('loading')) node.setAttribute('loading', 'lazy');
+        if (!node.hasAttribute('referrerpolicy')) node.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+        node.setAttribute('allowfullscreen', '');
+        const allowDefault = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+        if (!node.getAttribute('allow')) node.setAttribute('allow', allowDefault);
+      } catch (_e) {
+        node.parentNode && node.parentNode.removeChild(node);
+      }
+    }
+  });
+
+  // Block javascript: URLs on iframe src explicitly
+  DOMPurify.addHook('uponSanitizeAttribute', (node, data) => {
+    if (node.nodeName === 'IFRAME' && data.attrName === 'src') {
+      if (/^javascript:/i.test(data.attrValue || '')) data.keepAttr = false;
+    }
+  });
+}
+
 function sanitize(html) {
   if (!window.DOMPurify) return html;
+  // Ensure hooks/allowances are registered once
+  configureSanitizerForEmbeds();
   return DOMPurify.sanitize(html, {
     USE_PROFILES: { html: true },
-    ADD_TAGS: ['figure', 'figcaption'],
-    ADD_ATTR: ['class', 'loading']
+    // Keep figure elements for images and video captions
+    ADD_TAGS: ['figure', 'figcaption', 'iframe'],
+    ADD_ATTR: [
+      'class', 'loading',
+      // iframe-safe attributes
+      'src', 'title', 'width', 'height', 'allow', 'allowfullscreen', 'referrerpolicy', 'sandbox'
+    ]
   });
 }
 

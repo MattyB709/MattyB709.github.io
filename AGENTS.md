@@ -59,6 +59,81 @@ Markdown content here...
 - Wrote usage instructions and frontmatter spec in this file.
 - Added figure-aware image rendering with caption support, sanitizer allowances, and theme styles.
 
+### 2025-12-16 — External Video Embeds (YouTube/Vimeo)
+- JS: Enabled safe external video embeds via `iframe`.
+  - Updated `assets/js/render.js` `sanitize()` to allow `iframe` and required attributes (`src`, `title`, `width`, `height`, `allow`, `allowfullscreen`, `referrerpolicy`, `sandbox`, `loading`).
+  - Added a one-time DOMPurify configuration (`configureSanitizerForEmbeds`) with hooks to:
+    - Allow only trusted hosts: `youtube.com`, `youtube-nocookie.com`, and `player.vimeo.com`.
+    - Require YouTube embed paths (`/embed/...`).
+    - Enforce safe defaults: `loading="lazy"`, `referrerpolicy="strict-origin-when-cross-origin"`, `allowfullscreen`, and a sensible `allow` list.
+- CSS: Made embeds responsive and consistent with theme.
+  - Updated `assets/css/base.css` to style `.post-content iframe, .post-content video` with full-width, border radius, spacing, and `aspect-ratio: 16 / 9` for iframes.
+
+## Video Embeds — How To
+- Supported providers: YouTube (including `youtube-nocookie`) and Vimeo.
+- Author in Markdown using raw HTML anywhere in the post body. Wrap in a `figure` to get a matching caption style.
+
+Example — YouTube (privacy-enhanced):
+
+```html
+<figure class="post-figure">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/VIDEO_ID"
+    title="My demo video"
+    loading="lazy"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+    referrerpolicy="strict-origin-when-cross-origin">
+  </iframe>
+  <figcaption>Quick demo of the feature</figcaption>
+  </figure>
+```
+
+Example — Vimeo:
+
+```html
+<figure class="post-figure">
+  <iframe
+    src="https://player.vimeo.com/video/VIDEO_ID"
+    title="My Vimeo demo"
+    loading="lazy"
+    allow="autoplay; fullscreen; picture-in-picture"
+    allowfullscreen
+    referrerpolicy="strict-origin-when-cross-origin">
+  </iframe>
+  <figcaption>Launch trailer</figcaption>
+</figure>
+```
+
+Notes
+- Only `https://www.youtube.com/embed/...`, `https://www.youtube-nocookie.com/embed/...`, and `https://player.vimeo.com/video/...` are allowed. Plain watch URLs (e.g. `watch?v=`) are blocked—use the embed form.
+- You can omit `loading`, `allow`, `referrerpolicy`, and `allowfullscreen`; safe defaults are applied during sanitization.
+- The embed scales responsively to the post width with a 16:9 aspect ratio by default.
+
+### 2025-12-16 — Video Shortcodes
+- JS: Added simple, author-friendly shortcodes expanded before Markdown rendering.
+  - Implemented in `assets/js/render.js`: `applyShortcodes()`, `toYouTubeEmbed()`, `toVimeoEmbed()`, and `buildEmbedFigure()`.
+  - Supported forms:
+    - `{{ youtube: ID_OR_URL "Optional caption" }}` → embeds YouTube via `youtube-nocookie.com`.
+    - `{{ vimeo: ID_OR_URL "Optional caption" }}` → embeds Vimeo via `player.vimeo.com`.
+  - You can provide either a plain video ID or a full video URL; the parser normalizes to the proper embed URL.
+
+Usage examples in Markdown:
+
+```
+Here is a quick demo:
+
+{{ youtube: dQw4w9WgXcQ "Launch trailer" }}
+
+And a Vimeo sample:
+
+{{ vimeo: 76979871 "The New Vimeo Player" }}
+```
+
+Notes
+- Shortcodes are expanded into `<figure>` + `<iframe>` blocks before Marked runs and are still sanitized by DOMPurify with the same origin checks.
+- Captions are optional; omit the quoted caption to skip `<figcaption>`.
+
 ## Image Support
 - Place image files anywhere in the repo (e.g. `assets/images/` or alongside related content) and reference them with a relative path from the site root.
 - Use standard Markdown image syntax; the optional title field becomes the figure caption:

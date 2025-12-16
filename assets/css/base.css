@@ -113,3 +113,18 @@ figure.post-figure figcaption {
   font-size: 0.9rem;
   font-style: italic;
 }
+
+/* Embedded media (YouTube/Vimeo iframes, HTML5 video) */
+.post-content iframe,
+.post-content video {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  margin: var(--space-5) auto;
+  border: 0;
+  border-radius: var(--radius);
+}
+
+/* Maintain a pleasant default aspect ratio for iframes */
+.post-content iframe { aspect-ratio: 16 / 9; }
