@@ -24,7 +24,6 @@ function headerTemplate() {
     <div class="container">
       <nav class="nav">
         <a href="index.html">Home</a>
-        <a href="blog.html">Blog</a>
         <a href="projects.html">Projects</a>
       </nav>
     </div>
@@ -35,7 +34,7 @@ function footerTemplate() {
   return `
   <footer class="site-footer">
     <div class="container">
-      <div>© 2025 · Matthew Builes · <a href="mailto:matthew.builes8@gmail.com">matthew.builes8@gmail.com</a></div>
+      <div>Matthew Builes · <a href="mailto:matthew.builes8@gmail.com">matthew.builes8@gmail.com</a> · <a href="https://github.com/MattyB709">GitHub</a> · <a href="https://www.linkedin.com/in/matthew-builes-8a0664270">LinkedIn</a></div>
     </div>
   </footer>`;
 }
