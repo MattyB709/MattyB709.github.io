@@ -5,9 +5,7 @@ subtitle: I implemented a neural network from scratch in Numpy.
 date: 2025-04-03 
 ---
 
-TLDR: I spent the last 2 days implementing and training a neural network from scratch in Numpy. I used 
-an MLP architecture with 3 layers, ReLU activations, and cross entropy loss trained on torchvision's
-MNIST dataset. After ~10 min of training I got >97% accuracy on the test set, which I was satisfied with
+TLDR: I spent the last few days implementing and training a neural network from scratch in Numpy. I used an MLP architecture with 3 layers, ReLU activations, and cross entropy loss trained on torchvision's MNIST dataset. After ~10 min of training I got >97% accuracy on the test set, which I was satisfied with.
 
 Code: [https://github.com/MattyB709/numpyNN](https://github.com/MattyB709/numpyNN)
 
@@ -34,4 +32,4 @@ layers. I had no idea how these gradients were actually calculated or passed bac
 ```self.weights_grad = self.x.T @ delta```.
 This may not seem like a big issue, but instead of changing the parameters of the gradients that the optimizer had access to, it was just overwriting the reference in self.weights_grad to a completely different reference, meaning the gradients the optimizer had access to never were updated! This meant that the gradients the optimizer saw were just always zero, resulting in no change to the parameters, and no improvement in training. This is probably the first time I've ever had to think about references in Python, so I'm glad I was able to learn one useful thing from Java. The fix was simple, I used numpy slicing to edit the gradient array in place: 
 ```self.weights_grad[:] = self.x.T @ delta```.
-With this, everything was fixed, and after about 10 minutes of training (25 epochs) I got performance I was satisfied with. Onto more RL projects. 
+With this, everything was fixed, and after about 10 minutes of training (25 epochs) I got performance I was satisfied with. Onto more projects. 

@@ -11,6 +11,12 @@
       "subtitle": "I built an end to end object detection system to detect personal protective equipment (PPE).",
       "title": "Automatic PPE Detection",
       "date": "2025-08-30"
+    },
+    {
+      "slug": "cabos",
+      "subtitle": "A custom operating system built from scratch in Rust, and what I learned about working on large software projects",
+      "title": "CabOS",
+      "date": "2026-05-12"
     }
   ]
 }

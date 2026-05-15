@@ -11,10 +11,22 @@ function formatDate(iso) {
   } catch { return iso; }
 }
 
+function currentNavHref(url = new URL(location.href)) {
+  const pathname = url.pathname;
+  if (pathname.endsWith('projects.html')) return 'projects.html';
+  if (pathname.endsWith('post.html') && url.searchParams.get('type') === 'projects') return 'projects.html';
+  if (pathname.endsWith('index.html') || pathname === '/' || pathname.endsWith('/')) return 'index.html';
+  return null;
+}
+
 function setActiveNav(pathname) {
+  const activeHref = currentNavHref(new URL(location.href));
   $all('header .nav a').forEach(a => {
     const href = a.getAttribute('href');
-    if (href && pathname.endsWith(href)) a.classList.add('active');
+    if (!href) return;
+    if ((activeHref && href === activeHref) || pathname.endsWith(href)) {
+      a.classList.add('active');
+    }
   });
 }
 
