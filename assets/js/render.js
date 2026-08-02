@@ -225,56 +225,50 @@ function renderMathIn(el) {
   });
 }
 
+function renderMarkdown(md) {
+  return sanitize(markdownToHtml(md));
+}
+
+function buildPostArticle(raw, slug = 'untitled', { includeDate = true } = {}) {
+  const { meta, body } = parseFrontmatter(raw);
+  const article = document.createElement('article');
+  article.className = 'post';
+
+  const header = document.createElement('header');
+  header.innerHTML = `
+    <h1>${escapeHtml(meta.title || slug)}</h1>
+    ${meta.subtitle ? `<div class="subtitle">${escapeHtml(meta.subtitle)}</div>` : ''}
+    ${includeDate && meta.date ? `<div class="post-meta">${escapeHtml(formatDate(meta.date))}</div>` : ''}
+  `;
+
+  const content = document.createElement('div');
+  content.className = 'post-content';
+  content.innerHTML = renderMarkdown(body);
+  article.append(header, content);
+  renderMathIn(article);
+  return { article, meta, body };
+}
+
 async function loadPost(type, slug) {
   const mdPath = `content/${type}/${slug}.md`;
   const raw = await fetchText(mdPath);
-  const { meta, body } = parseFrontmatter(raw);
+  const { article, meta } = buildPostArticle(raw, slug);
   document.title = meta.title ? `Matthew - ${meta.title}` : 'Matthew - Post';
 
   const main = document.querySelector('main');
-  const header = document.createElement('header');
-  header.innerHTML = `
-    <h1>${meta.title || slug}</h1>
-    ${meta.subtitle ? `<div class="subtitle">${meta.subtitle}</div>` : ''}
-    ${meta.date ? `<div class="post-meta">${formatDate(meta.date)}</div>` : ''}
-  `;
-
-  const html = sanitize(markdownToHtml(body));
-  const article = document.createElement('article');
-  article.className = 'post';
-  article.appendChild(header);
-  const content = document.createElement('div');
-  content.className = 'post-content';
-  content.innerHTML = html;
-  article.appendChild(content);
   main.innerHTML = '';
   main.appendChild(article);
-  renderMathIn(article);
 }
 
 async function loadPage(slug) {
   const mdPath = `content/pages/${slug}.md`;
   const raw = await fetchText(mdPath);
-  const { meta, body } = parseFrontmatter(raw);
+  const { article, meta } = buildPostArticle(raw, slug, { includeDate: false });
   document.title = meta.title ? `Matthew - ${meta.title}` : 'Matthew - Page';
 
   const main = document.querySelector('main');
-  const header = document.createElement('header');
-  header.innerHTML = `
-    <h1>${meta.title || slug}</h1>
-    ${meta.subtitle ? `<div class="subtitle">${meta.subtitle}</div>` : ''}
-  `;
-  const html = sanitize(markdownToHtml(body));
-  const article = document.createElement('article');
-  article.className = 'post';
-  article.appendChild(header);
-  const content = document.createElement('div');
-  content.className = 'post-content';
-  content.innerHTML = html;
-  article.appendChild(content);
   main.innerHTML = '';
   main.appendChild(article);
-  renderMathIn(article);
 }
 
 async function loadList(type) {
@@ -302,5 +296,14 @@ async function loadList(type) {
   main.appendChild(ul);
 }
 
-// Expose for page scripts
-window.Vibe = { loadPost, loadPage, loadList };
+// Expose for page scripts and the local editor
+window.Vibe = {
+  loadPost,
+  loadPage,
+  loadList,
+  parseFrontmatter,
+  markdownToHtml,
+  renderMarkdown,
+  renderMathIn,
+  buildPostArticle
+};

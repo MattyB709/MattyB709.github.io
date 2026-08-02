@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Local post editor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/base.css" />
+    <link rel="stylesheet" href="/assets/css/theme.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous" />
+    <link rel="stylesheet" href="/tools/editor/editor.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js" crossorigin="anonymous"></script>
+    <script>window.formatDate = value => { const date = new Date(value); return Number.isNaN(date.valueOf()) ? value : date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: '2-digit' }); };</script>
+    <script defer src="/assets/js/render.js"></script>
+    <script type="module" src="/tools/editor/editor.js"></script>
+  </head>
+  <body class="editor-app">
+    <aside class="editor-sidebar" aria-label="Post files">
+      <div class="sidebar-heading">
+        <div>
+          <span class="eyebrow">Local tool</span>
+          <h1>Posts</h1>
+        </div>
+        <button id="new-post" class="icon-button" type="button" title="Create post" aria-label="Create post">+</button>
+      </div>
+      <div id="file-list" class="file-list"><p class="empty-message">Loading posts…</p></div>
+    </aside>
+
+    <main class="editor-workspace">
+      <header class="editor-toolbar">
+        <button id="sidebar-toggle" class="icon-button mobile-only" type="button" aria-label="Toggle post list">☰</button>
+        <div class="file-identity">
+          <strong id="current-file">Choose a post</strong>
+          <span id="save-state" class="save-state" data-state="idle">Idle</span>
+        </div>
+        <div class="toolbar-actions">
+          <button id="reload-file" type="button" disabled>Reload</button>
+          <button id="save-file" type="button" disabled>Save</button>
+          <button id="site-preview" type="button" disabled>Site preview</button>
+        </div>
+      </header>
+      <div id="editor" class="editor-surface" aria-label="Markdown editor"></div>
+      <div id="welcome" class="editor-welcome">
+        <p>Select a Markdown file, or create a new post.</p>
+      </div>
+    </main>
+
+    <dialog id="new-post-dialog" class="editor-dialog">
+      <form id="new-post-form">
+        <div class="dialog-heading">
+          <h2>New post</h2>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Close">×</button>
+        </div>
+        <label>Content type<select id="new-type" required></select></label>
+        <label>Title<input id="new-title" autocomplete="off" required /></label>
+        <label>Slug<input id="new-slug" autocomplete="off" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" /></label>
+        <label>Subtitle<input id="new-subtitle" autocomplete="off" /></label>
+        <label>Date<input id="new-date" type="date" required /></label>
+        <p id="new-post-error" class="form-error" role="alert"></p>
+        <div class="dialog-actions">
+          <button type="button" data-close-dialog>Cancel</button>
+          <button type="submit">Create post</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="preview-dialog" class="preview-dialog">
+      <div class="preview-toolbar">
+        <strong>Published-site preview</strong>
+        <button class="icon-button" type="button" data-close-preview aria-label="Close preview">×</button>
+      </div>
+      <main id="preview-content" class="container"></main>
+    </dialog>
+  </body>
+</html>

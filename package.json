@@ -1,5 +1,24 @@
 {
+  "type": "module",
+  "scripts": {
+    "editor": "vite --host 127.0.0.1 --open /tools/editor/",
+    "test": "vitest run"
+  },
   "dependencies": {
     "codex": "^0.2.3"
+  },
+  "devDependencies": {
+    "@codemirror/commands": "^6.8.1",
+    "@codemirror/lang-markdown": "^6.3.4",
+    "@codemirror/language": "^6.11.3",
+    "@codemirror/search": "^6.5.11",
+    "@codemirror/state": "^6.5.2",
+    "@codemirror/view": "^6.38.1",
+    "@lezer/markdown": "^1.4.3",
+    "dompurify": "^3.4.12",
+    "jsdom": "^29.1.1",
+    "marked": "^18.0.7",
+    "vite": "^7.0.6",
+    "vitest": "^3.2.4"
   }
 }
