@@ -8,6 +8,15 @@
   --border: #FFA86A;
   --code-bg: #bc8d6b;
   --code-fg: #222129;
+  --code-block-bg: #302e38;
+  --code-block-fg: #eadfd6;
+  --syntax-comment: #a59790;
+  --syntax-keyword: #d8a0e8;
+  --syntax-string: #9fd5b4;
+  --syntax-number: #efa5b7;
+  --syntax-type: #8bc8e8;
+  --syntax-function: #efc17c;
+  --syntax-meta: #c5a6df;
 }
 
 body {
@@ -42,12 +51,33 @@ footer.site-footer a { color: var(--link); }
 
 /* Code styling */
 code {
-  background-color: var(--code-bg);
-  color: var(--code-fg);
+  background-color: var(--code-block-bg);
+  color: var(--code-block-fg);
+  font-size: 0.875rem;
   border-radius: 3px;
 }
-pre { background-color: var(--code-bg); }
-pre, pre code { color: var(--code-fg); }
+pre { background-color: var(--code-block-bg); font-size: 0.875rem; }
+pre, pre code { color: var(--code-block-fg); }
+
+/* Token colors only: code block spacing, background, and typography stay unchanged. */
+.hljs-comment, .hljs-quote { color: var(--syntax-comment); font-style: italic; }
+.hljs-keyword, .hljs-selector-tag, .hljs-doctag { color: var(--syntax-keyword); font-weight: 700; }
+.hljs-string, .hljs-regexp, .hljs-template-tag, .hljs-template-variable { color: var(--syntax-string); }
+.hljs-number, .hljs-literal, .hljs-symbol, .hljs-bullet { color: var(--syntax-number); }
+.hljs-type, .hljs-built_in { color: var(--syntax-type); }
+.hljs-title, .hljs-title.class_, .hljs-title.function_, .hljs-section { color: var(--syntax-function); }
+.hljs-meta, .hljs-attr, .hljs-attribute, .hljs-variable, .hljs-property { color: var(--syntax-meta); }
+
+/* Footnotes */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+[data-footnote-ref] { margin-left: 0.08em; color: var(--link); font-size: 0.75em; font-weight: 700; text-decoration: none; }
+.footnotes { margin-top: var(--space-6); padding-top: var(--space-4); border-top: 1px dashed var(--fg); font-size: 0.875rem; }
+.footnotes ol { margin: 0; padding-left: 1.5rem; }
+.footnotes li { padding-left: var(--space-2); }
+.footnotes p { margin-bottom: var(--space-2); }
+.footnotes a { color: var(--link); }
+.footnotes [data-footnote-backref] { margin-left: var(--space-1); text-decoration: none; }
+[id^='footnote-'] { scroll-margin-top: var(--space-6); }
 
 /* Blockquote styling similar to provided */
 blockquote {

@@ -43,6 +43,22 @@ describe('live Markdown preview', () => {
     expect(hidden).toContainEqual(expect.objectContaining({ from: destinationFrom }));
   });
 
+  it('renders numbered footnote references and definitions away from the cursor', () => {
+    const doc = 'Cursor\n\nDemand paging defers work.[^vm]\n\n[^vm]: The page is populated after a fault.';
+    const referenceFrom = doc.indexOf('[^vm]');
+    const definitionFrom = doc.lastIndexOf('[^vm]');
+    const inactive = collectPreviewTokens(stateFor(doc, 0));
+    expect(inactive).toContainEqual(expect.objectContaining({ type: 'footnote-ref', from: referenceFrom, source: '1' }));
+    expect(inactive).toContainEqual(expect.objectContaining({ type: 'footnote-definition', from: definitionFrom, source: '1' }));
+    expect(inactive).toContainEqual(expect.objectContaining({ kind: 'line', className: 'cm-live-footnote-definition' }));
+
+    const active = collectPreviewTokens(stateFor(doc, referenceFrom + 2));
+    expect(active).not.toContainEqual(expect.objectContaining({ type: 'footnote-ref', from: referenceFrom }));
+
+    const unresolved = collectPreviewTokens(stateFor('Cursor\n\nMissing definition.[^missing]', 0));
+    expect(unresolved).not.toContainEqual(expect.objectContaining({ type: 'footnote-ref' }));
+  });
+
   it('keeps fenced code as native editable lines', () => {
     const doc = 'Before\n\n```js\nconst x = 1;\n```\n\nAfter';
     const fenceStart = doc.indexOf('```');

@@ -3,11 +3,13 @@ import path from 'node:path';
 import createDOMPurify from 'dompurify';
 import { JSDOM } from 'jsdom';
 import { marked } from 'marked';
+import markedFootnote from 'marked-footnote';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 let window;
 let Vibe;
 let renderMathInElement;
+let highlightElement;
 
 beforeEach(async () => {
   const dom = new JSDOM('<!doctype html><body></body>', {
@@ -16,10 +18,13 @@ beforeEach(async () => {
   });
   window = dom.window;
   window.marked = marked;
+  window.markedFootnote = markedFootnote;
   window.DOMPurify = createDOMPurify(window);
   window.formatDate = value => value;
   renderMathInElement = vi.fn();
   window.renderMathInElement = renderMathInElement;
+  highlightElement = vi.fn(element => element.classList.add('hljs'));
+  window.hljs = { highlightElement };
   const source = await readFile(path.resolve('assets/js/render.js'), 'utf8');
   window.eval(source);
   Vibe = window.Vibe;
@@ -39,6 +44,18 @@ describe('shared site renderer', () => {
     expect(html).toContain('<figcaption>Caption</figcaption>');
   });
 
+  it('renders linked and sanitized footnotes at the end of the post', () => {
+    const html = Vibe.renderMarkdown('Virtual memory delays allocation.[^vm]\n[^vm]: The mapping is populated on demand.');
+    const root = window.document.createElement('div');
+    root.innerHTML = html;
+    const reference = root.querySelector('[data-footnote-ref]');
+    const footnote = root.querySelector('[data-footnotes]');
+    expect(reference?.textContent).toBe('1');
+    expect(reference?.getAttribute('href')).toBe('#footnote-vm');
+    expect(footnote?.querySelector('#footnote-vm')?.textContent).toContain('The mapping is populated on demand.');
+    expect(footnote?.querySelector('[data-footnote-backref]')?.getAttribute('href')).toBe('#footnote-ref-vm');
+  });
+
   it('renders approved embeds and strips unsafe HTML', () => {
     const youtube = Vibe.renderMarkdown('{{ youtube: abc123 "Demo" }}');
     expect(youtube).toContain('https://www.youtube-nocookie.com/embed/abc123');
@@ -47,6 +64,31 @@ describe('shared site renderer', () => {
     const unsafe = Vibe.renderMarkdown('<img src="x" onerror="alert(1)"><iframe src="https://evil.example/embed/x"></iframe>');
     expect(unsafe).not.toContain('onerror');
     expect(unsafe).not.toContain('evil.example');
+  });
+
+  it('highlights fenced code after it passes through the shared renderer', () => {
+    const raw = '---\ntitle: Code\n---\n\n```rust\nfn main() { let answer = 42; }\n```';
+    const { article } = Vibe.buildPostArticle(raw, 'code');
+    const code = article.querySelector('pre code');
+    expect(code.classList).toContain('language-rust');
+    expect(code.classList).toContain('hljs');
+    expect(highlightElement).toHaveBeenCalledOnce();
+    expect(highlightElement).toHaveBeenCalledWith(code);
+  });
+
+  it('estimates and displays reading time from the rendered post text', () => {
+    expect(Vibe.estimateReadingMinutes('one two three')).toBe(1);
+    expect(Vibe.estimateReadingMinutes(Array(401).fill('word').join(' '))).toBe(3);
+
+    const body = Array(201).fill('word').join(' ');
+    const { article } = Vibe.buildPostArticle(`---\ntitle: Reading time\ndate: 2026-08-01\n---\n\n${body}`, 'reading-time');
+    expect(article.querySelector('.post-meta').textContent).toBe('2026-08-01 · 2 min read');
+  });
+
+  it('omits post metadata on standalone pages', () => {
+    const raw = '---\ntitle: About\ndate: 2026-08-01\n---\n\nA short standalone page.';
+    const { article } = Vibe.buildPostArticle(raw, 'about', { includeDate: false, includeReadingTime: false });
+    expect(article.querySelector('.post-meta')).toBeNull();
   });
 
   it('builds a complete escaped post and invokes the existing math renderer', () => {

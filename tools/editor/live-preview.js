@@ -44,6 +44,39 @@ function specialWidgetRanges(text, excluded) {
       }
     }
   }
+
+  const footnoteNumbers = new Map();
+  const numberForFootnote = label => {
+    if (!footnoteNumbers.has(label)) footnoteNumbers.set(label, footnoteNumbers.size + 1);
+    return footnoteNumbers.get(label);
+  };
+  const definitionExpression = /^\[\^([^\]\n]+)\]:[ \t]*/gm;
+  const definitions = [...text.matchAll(definitionExpression)].filter(match => {
+    const range = { from: match.index, to: match.index + match[0].length };
+    return !overlaps(range.from, range.to, excluded) && !overlaps(range.from, range.to, candidates);
+  });
+  const definedLabels = new Set(definitions.map(match => match[1]));
+  const referenceExpression = /\[\^([^\]\n]+)\](?!:)/g;
+  for (const match of text.matchAll(referenceExpression)) {
+    const from = match.index;
+    const to = from + match[0].length;
+    if (definedLabels.has(match[1]) && !overlaps(from, to, excluded) && !overlaps(from, to, candidates)) {
+      candidates.push({
+        kind: 'widget', type: 'footnote-ref', from, to,
+        source: String(numberForFootnote(match[1]))
+      });
+    }
+  }
+  for (const match of definitions) {
+    const from = match.index;
+    const to = from + match[0].length;
+    if (footnoteNumbers.has(match[1]) && !overlaps(from, to, candidates)) {
+      candidates.push({
+        kind: 'widget', type: 'footnote-definition', from, to,
+        source: String(footnoteNumbers.get(match[1]))
+      });
+    }
+  }
   return candidates.sort((a, b) => a.from - b.from);
 }
 
@@ -140,7 +173,12 @@ export function collectPreviewTokens(state) {
     ...tokens.filter(token => token.kind === 'widget')
   ];
   for (const token of specialWidgetRanges(state.doc.toString(), excluded)) {
-    if (!overlaps(token.from, token.to, expandedActive)) tokens.push(token);
+    if (overlaps(token.from, token.to, expandedActive)) continue;
+    tokens.push(token);
+    if (token.type === 'footnote-definition') {
+      const line = state.doc.lineAt(token.from);
+      tokens.push({ kind: 'line', from: line.from, to: line.from, className: 'cm-live-footnote-definition' });
+    }
   }
   return tokens;
 }
@@ -184,6 +222,10 @@ class RenderedWidget extends WidgetType {
     } else if (this.type === 'list-mark') {
       wrapper.classList.add('cm-rendered-list-mark');
       wrapper.textContent = /^\d/.test(this.source) ? this.source : '•';
+    } else if (this.type === 'footnote-ref') {
+      wrapper.textContent = this.source;
+    } else if (this.type === 'footnote-definition') {
+      wrapper.textContent = `${this.source}.`;
     } else if (this.type === 'math-inline' || this.type === 'math-block') {
       wrapper.textContent = this.source;
       window.Vibe.renderMathIn(wrapper);

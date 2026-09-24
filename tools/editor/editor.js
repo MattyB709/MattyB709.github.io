@@ -1,10 +1,11 @@
 import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands';
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
-import { bracketMatching, foldKeymap, indentOnInput } from '@codemirror/language';
+import { bracketMatching, foldKeymap, indentOnInput, syntaxHighlighting } from '@codemirror/language';
 import { highlightSelectionMatches, searchKeymap } from '@codemirror/search';
 import { EditorState } from '@codemirror/state';
 import { EditorView, drawSelection, dropCursor, highlightSpecialChars, keymap } from '@codemirror/view';
 import { GFM } from '@lezer/markdown';
+import { codeHighlightStyle, codeLanguages } from './code-highlighting.js';
 import { initialCursorPosition, livePreview, moveIntoAdjacentMath } from './live-preview.js';
 
 const API_ROOT = '/__editor/api';
@@ -155,6 +156,19 @@ function schedulePreview() {
   });
 }
 
+function previewHashTarget(link) {
+  const href = link.getAttribute('href');
+  if (!href?.startsWith('#') || href.length === 1) return null;
+  let id;
+  try {
+    id = decodeURIComponent(href.slice(1));
+  } catch {
+    return null;
+  }
+  return [...elements.previewContent.querySelectorAll('[id]')].find(element => element.id === id) || null;
+}
+
+
 const view = new EditorView({
   parent: elements.editor,
   state: EditorState.create({
@@ -167,7 +181,8 @@ const view = new EditorView({
       indentOnInput(),
       bracketMatching(),
       highlightSelectionMatches(),
-      markdown({ base: markdownLanguage, extensions: [GFM] }),
+      markdown({ base: markdownLanguage, codeLanguages, extensions: [GFM] }),
+      syntaxHighlighting(codeHighlightStyle),
       livePreview,
       EditorState.tabSize.of(2),
       EditorView.lineWrapping,
@@ -337,6 +352,13 @@ elements.preview.addEventListener('click', () => {
   renderSitePreview();
 });
 elements.previewDialog.querySelector('[data-close-preview]').addEventListener('click', () => elements.previewDialog.close());
+elements.previewContent.addEventListener('click', event => {
+  const link = event.target.closest?.('a[href^="#"]');
+  const target = link ? previewHashTarget(link) : null;
+  if (!target) return;
+  event.preventDefault();
+  target.scrollIntoView({ block: 'center' });
+});
 elements.newPost.addEventListener('click', async () => {
   await saveNow();
   if (dirty) return;
