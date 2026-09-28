@@ -105,11 +105,37 @@ function applyShortcodes(md) {
   return md;
 }
 
+function normalizeFootnoteDefinitions(md) {
+  const normalized = [];
+  let fence = null;
+  for (const line of md.split('\n')) {
+    const marker = /^\s*(`{3,}|~{3,})/.exec(line)?.[1];
+    if (marker) {
+      if (!fence) {
+        fence = { character: marker[0], length: marker.length };
+      } else if (marker[0] === fence.character && marker.length >= fence.length) {
+        fence = null;
+      }
+      normalized.push(line);
+      continue;
+    }
+    if (!fence && /^\[\^[^\]\n]+\]:/.test(line) && normalized.at(-1)?.trim()) {
+      normalized.push('');
+    }
+    normalized.push(line);
+  }
+  return normalized.join('\n');
+}
+
 function markdownToHtml(md) {
   // Configure marked for minimalist output
   if (window.marked) {
     // Expand custom shortcodes before Markdown parsing
-    md = applyShortcodes(md);
+    md = normalizeFootnoteDefinitions(applyShortcodes(md));
+    if (window.markedFootnote && !marked.__VIBE_FOOTNOTES_CONFIGURED) {
+      marked.use(window.markedFootnote());
+      marked.__VIBE_FOOTNOTES_CONFIGURED = true;
+    }
     const renderer = new marked.Renderer();
     renderer.image = (href, title, text) => {
       let src = href;
@@ -225,56 +251,68 @@ function renderMathIn(el) {
   });
 }
 
+function highlightCodeBlocks(root) {
+  if (!window.hljs?.highlightElement) return;
+  root.querySelectorAll('pre code:not(.hljs)').forEach(code => {
+    window.hljs.highlightElement(code);
+  });
+}
+
+function renderMarkdown(md) {
+  return sanitize(markdownToHtml(md));
+}
+
+function estimateReadingMinutes(text, wordsPerMinute = 200) {
+  const words = String(text || '').trim().match(/\S+/g)?.length || 0;
+  return Math.max(1, Math.ceil(words / wordsPerMinute));
+}
+
+function buildPostArticle(raw, slug = 'untitled', { includeDate = true, includeReadingTime = true } = {}) {
+  const { meta, body } = parseFrontmatter(raw);
+  const article = document.createElement('article');
+  article.className = 'post';
+
+  const content = document.createElement('div');
+  content.className = 'post-content';
+  content.innerHTML = renderMarkdown(body);
+  highlightCodeBlocks(content);
+
+  const metadata = [];
+  if (includeDate && meta.date) metadata.push(escapeHtml(formatDate(meta.date)));
+  if (includeReadingTime) metadata.push(`${estimateReadingMinutes(content.textContent)} min read`);
+
+  const header = document.createElement('header');
+  header.innerHTML = `
+    <h1>${escapeHtml(meta.title || slug)}</h1>
+    ${meta.subtitle ? `<div class="subtitle">${escapeHtml(meta.subtitle)}</div>` : ''}
+    ${metadata.length ? `<div class="post-meta">${metadata.join(' · ')}</div>` : ''}
+  `;
+
+  article.append(header, content);
+  renderMathIn(article);
+  return { article, meta, body };
+}
+
 async function loadPost(type, slug) {
   const mdPath = `content/${type}/${slug}.md`;
   const raw = await fetchText(mdPath);
-  const { meta, body } = parseFrontmatter(raw);
+  const { article, meta } = buildPostArticle(raw, slug);
   document.title = meta.title ? `Matthew - ${meta.title}` : 'Matthew - Post';
 
   const main = document.querySelector('main');
-  const header = document.createElement('header');
-  header.innerHTML = `
-    <h1>${meta.title || slug}</h1>
-    ${meta.subtitle ? `<div class="subtitle">${meta.subtitle}</div>` : ''}
-    ${meta.date ? `<div class="post-meta">${formatDate(meta.date)}</div>` : ''}
-  `;
-
-  const html = sanitize(markdownToHtml(body));
-  const article = document.createElement('article');
-  article.className = 'post';
-  article.appendChild(header);
-  const content = document.createElement('div');
-  content.className = 'post-content';
-  content.innerHTML = html;
-  article.appendChild(content);
   main.innerHTML = '';
   main.appendChild(article);
-  renderMathIn(article);
 }
 
 async function loadPage(slug) {
   const mdPath = `content/pages/${slug}.md`;
   const raw = await fetchText(mdPath);
-  const { meta, body } = parseFrontmatter(raw);
+  const { article, meta } = buildPostArticle(raw, slug, { includeDate: false, includeReadingTime: false });
   document.title = meta.title ? `Matthew - ${meta.title}` : 'Matthew - Page';
 
   const main = document.querySelector('main');
-  const header = document.createElement('header');
-  header.innerHTML = `
-    <h1>${meta.title || slug}</h1>
-    ${meta.subtitle ? `<div class="subtitle">${meta.subtitle}</div>` : ''}
-  `;
-  const html = sanitize(markdownToHtml(body));
-  const article = document.createElement('article');
-  article.className = 'post';
-  article.appendChild(header);
-  const content = document.createElement('div');
-  content.className = 'post-content';
-  content.innerHTML = html;
-  article.appendChild(content);
   main.innerHTML = '';
   main.appendChild(article);
-  renderMathIn(article);
 }
 
 async function loadList(type) {
@@ -302,5 +340,16 @@ async function loadList(type) {
   main.appendChild(ul);
 }
 
-// Expose for page scripts
-window.Vibe = { loadPost, loadPage, loadList };
+// Expose for page scripts and the local editor
+window.Vibe = {
+  loadPost,
+  loadPage,
+  loadList,
+  parseFrontmatter,
+  markdownToHtml,
+  renderMarkdown,
+  renderMathIn,
+  highlightCodeBlocks,
+  estimateReadingMinutes,
+  buildPostArticle
+};
